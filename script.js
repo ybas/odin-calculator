@@ -3,7 +3,8 @@ const mathDisplay = document.querySelector(".math-display");
 const objMath = {
    firstNumber: '',
    operator: '',
-   secondNumber: ''
+   secondNumber: '',
+   calculated: false
 }
 
 function calculate() {
@@ -27,31 +28,58 @@ function calculate() {
             sumResult = firstFloat / secondFloat;
             break;
       }
-      objMath.firstNumber = sumResult;
+      if (sumResult === Infinity) {
+         objMath.firstNumber = "ERROR";
+      } else {
+         objMath.firstNumber = sumResult;
+      }
       objMath.operator = '';
       objMath.secondNumber = '';
+      objMath.calculated = true;
       updateDisplay();
    }
 }
 
 function updateDisplay(){
-   const result = Object.values(objMath).join("");
+   const result = Object.entries(objMath).filter(([key]) => key !== "calculated").map(([key, value]) => `${value}`).join("");
    mathDisplay.value = result;
 }
 
 function inputNumber(value) {
-   if (objMath.firstNumber === '') {
+   const {firstNumber, operator, calculated} = objMath;
+   if (calculated) {
       objMath.firstNumber = value;
-   } else if (objMath.firstNumber !== '' && objMath.operator === '') {
-      objMath.firstNumber += value;
+      objMath.calculated = false;
    } else {
-      objMath.secondNumber += value;
+      if (firstNumber === '') {
+         objMath.firstNumber = value;
+      } else if (firstNumber !== '' && operator === '') {
+         objMath.firstNumber += value;
+      } else {
+         objMath.secondNumber += value;
+      }
    }
    updateDisplay();
 }
 
 function inputOperator(value) {
-   objMath.operator = value;
+   if (objMath.firstNumber === 'ERROR') {
+      return;
+   } else if (objMath.firstNumber === '') {
+      if (value === "-") {
+         objMath.firstNumber = "-";
+      } else {
+         return;
+      }
+   } else if (objMath.operator === '') {
+      objMath.operator = value;
+   } else {
+      if (objMath.secondNumber !== '') {
+         calculate();
+      } else {
+         objMath.operator = value;
+      }
+   }
    updateDisplay();
 }
 
@@ -72,6 +100,7 @@ function clearAll() {
    objMath.firstNumber = '';
    objMath.operator = '';
    objMath.secondNumber = '';
+   objMath.calculated = false;
    mathDisplay.value = 0;
 }
 
