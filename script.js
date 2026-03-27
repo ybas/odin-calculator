@@ -63,21 +63,24 @@ function inputNumber(value) {
 }
 
 function inputOperator(value) {
-   if (objMath.firstNumber === 'ERROR') {
-      return;
-   } else if (objMath.firstNumber === '') {
-      if (value === "-") {
-         objMath.firstNumber = "-";
-      } else {
+   const {firstNumber, operator, secondNumber, calculated} = objMath;
+   if (!calculated) {
+      if (firstNumber === 'ERROR') {
          return;
-      }
-   } else if (objMath.operator === '') {
-      objMath.operator = value;
-   } else {
-      if (objMath.secondNumber !== '') {
-         calculate();
-      } else {
+      } else if (firstNumber === '') {
+         if (value === "-") {
+            objMath.firstNumber = "-";
+         } else {
+            return;
+         }
+      } else if (operator === '') {
          objMath.operator = value;
+      } else {
+         if (secondNumber !== '') {
+            calculate();
+         } else {
+            objMath.operator = value;
+         }
       }
    }
    updateDisplay();
