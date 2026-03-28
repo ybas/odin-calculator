@@ -177,6 +177,32 @@ document.querySelector('.calculator-buttons').addEventListener('click', (event) 
    }
 });
 
+document.addEventListener("keydown", function(event) {
+   const key = event.key;
+
+   if (!isNaN(key)) {
+      inputNumber(key);
+   } else if (["+", "-", "*", "/"].includes(key)) {
+      let operator;
+      if (key === "*") {
+         operator = "×";
+      } else if ( key === "/5.2/") {
+         operator = "÷"
+      } else {
+         operator = key;
+      }
+      inputOperator(operator);
+   } else if (key === ".") {
+      inputDecimal();
+   } else if (key === "Enter" || key === "=") {
+      calculate();
+   } else if (key === "Backspace") {
+      backSpace();
+   } else if (key === "Escape") {
+      clearAll();
+   }
+});
+
 function isEmpty(value) {
   return (
     value === null ||
