@@ -9,7 +9,7 @@ const objMath = {
 
 function calculate() {
    const {firstNumber, operator, secondNumber} = objMath;
-   if (firstNumber !== '' && operator !== '' && secondNumber !== '') {
+   if (!isEmpty(firstNumber) && !isEmpty(operator) && !isEmpty(secondNumber)) {
       let sumResult;
       let firstFloat = parseFloat(firstNumber);
       let secondFloat = parseFloat(secondNumber);
@@ -31,7 +31,7 @@ function calculate() {
       if (sumResult === Infinity) {
          objMath.firstNumber = "ERROR";
       } else {
-         objMath.firstNumber = sumResult;
+         objMath.firstNumber = parseFloat(sumResult.toFixed(7)).toString();
       }
       objMath.operator = '';
       objMath.secondNumber = '';
@@ -42,7 +42,7 @@ function calculate() {
 
 function updateDisplay(){
    const result = Object.entries(objMath).filter(([key]) => key !== "calculated").map(([key, value]) => `${value}`).join("");
-   mathDisplay.value = result;
+   mathDisplay.value = isEmpty(result) ? '0' : result;
 }
 
 function inputNumber(value) {
@@ -51,13 +51,13 @@ function inputNumber(value) {
       objMath.firstNumber = value;
       objMath.calculated = false;
    } else {
-      if (firstNumber === '') {
+      if (isEmpty(firstNumber)) {
          objMath.firstNumber = value;
-      } else if (firstNumber !== '' && operator === '') {
+      } else if (!isEmpty(firstNumber) && isEmpty(operator)) {
          objMath.firstNumber += value;
       } else {
          objMath.secondNumber += value;
-      }
+      }0
    }
    updateDisplay();
 }
@@ -67,16 +67,16 @@ function inputOperator(value) {
    if (!calculated) {
       if (firstNumber === 'ERROR') {
          return;
-      } else if (firstNumber === '') {
+      } else if (isEmpty(firstNumber)) {
          if (value === "-") {
             objMath.firstNumber = "-";
          } else {
             return;
          }
-      } else if (operator === '') {
-         objMath.operator = value;
+      } else if (isEmpty(operator)) {
+         if (firstNumber !== "-") objMath.operator = value;
       } else {
-         if (secondNumber !== '') {
+         if (!isEmpty(secondNumber)) {
             calculate();
          } else {
             objMath.operator = value;
@@ -87,16 +87,47 @@ function inputOperator(value) {
 }
 
 function inputDecimal(value) {
-   if (objMath.operator === '') {
-      if (objMath.firstNumber === '') {
-         objMath.firstNumber += "0.";
+   if (objMath.calculated) clearAll();
+   const {firstNumber, operator, secondNumber, calculated} = objMath;
+   if (isEmpty(calculated)) {
+      if (isEmpty(operator)) {
+         if (isEmpty(firstNumber)) {
+            objMath.firstNumber += "0.";
+         } else {
+            if (firstNumber.includes(".")){
+               return;
+            } else { 
+               objMath.firstNumber += ".";
+            }
+         }
       } else {
-         objMath.firstNumber += ".";
+         if (isEmpty(secondNumber)) {
+            objMath.secondNumber += "0.";
+         } else {
+            if (secondNumber.includes(".")) {
+               return;
+            } else {
+               objMath.secondNumber += ".";
+            }
+         }
       }
-   } else {
-      objMath.secondNumber += ".";
    }
    updateDisplay();
+}
+
+function backSpace(){
+   if (objMath.calculated) clearAll();
+   const {firstNumber, operator, secondNumber, calculated} = objMath;
+   if (!calculated) {
+      if(!isEmpty(secondNumber)) {
+         objMath.secondNumber = secondNumber.slice(0, -1);
+      } else if (!isEmpty(operator)) {
+         objMath.operator = '';
+      } else if (!isEmpty(firstNumber)){
+         objMath.firstNumber = firstNumber.slice(0, -1);
+      }
+      updateDisplay();
+   }
 }
 
 function clearAll() {
@@ -128,6 +159,12 @@ document.querySelector('.calculator-buttons').addEventListener('click', (event) 
       inputDecimal(target.value);
       return;
    }
+   
+
+   if (target.classList.contains('backspace')) {
+      backSpace();
+      return;
+   }
 
    if (target.classList.contains('equal')) {
       calculate();
@@ -139,3 +176,12 @@ document.querySelector('.calculator-buttons').addEventListener('click', (event) 
       return;
    }
 });
+
+function isEmpty(value) {
+  return (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === false
+  )
+}

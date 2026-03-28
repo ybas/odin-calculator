@@ -57,6 +57,9 @@ button {
 button:hover {
    cursor: pointer;
 }
+.backspace {
+   background-color: chocolate;
+}
 .clear-all {
    background-color: red;
 }
@@ -66,5 +69,5 @@ button:hover {
 .equal {
    background-color: black;
    color: white;
-   grid-column: span 4;
+   grid-column: span 3;
 }
